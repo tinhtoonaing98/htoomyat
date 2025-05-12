@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Htoomyat Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7ff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    @media (max-width: 768px) {
+    #redeemBtn, .logout-btn {
+      width: 80%;
+      font-size: 22px;
+    }
+  }
+    .dashboard-container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #4b0082;
+      margin-bottom: 20px;
+    }
+
+    .user-info {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    .user-info p {
+      margin: 8px 0;
+      font-size: 16px;
+    }
+
+    .reward-goal {
+      background: #f0e6ff;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .reward-goal h2 {
+      margin: 0 0 10px;
+      color: #6a0dad;
+    }
+
+    .progress-bar {
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 20px;
+      margin-top: 10px;
+    }
+
+    .progress {
+      background: #6a0dad;
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s;
+    }
+
+    .recent-redemptions {
+      background: white;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+    }
+    .recent-redemptions ul {
+      list-style: none;
+      padding: 0;
+    }
+    .recent-redemptions li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+    .recent-redemptions li:last-child {
+      border-bottom: none;
+    }
+    #redemptionList {
+      list-style: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    #redemptionList li {
+      background: #f9f6ff;
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      font-size: 14px;
+      border-left: 4px solid #6a0dad;
+      text-align: left;
+    }
+
+
+    .logout-btn {
+      margin-top: 20px;
+      background: #6a0dad;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .logout-btn:hover {
+      background: #5a0080;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard-container">
+    <h1>WELCOME FROM HTOO MYAT PORTAL</h1>
+
+    <div class="user-info" id="userInfo">
+      <p>Username: Loading...</p>
+      <p>Email: Loading...</p>
+      <p>Mobile: Loading...</p>
+      <p>Points: Loading...</p>
+      <p>Last Login: Loading...</p>
+    </div>
+
+    <div class="reward-goal">
+      <h2 id="goalText">You just need ... points for Free Food!</h2>
+      <div class="progress-bar">
+        <div class="progress" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div class="recent-redemptions">
+      <h2>Recent Redemptions</h2>
+      <ul id="redemptionList">Loading...</ul>
+    </div>
+    <div style="text-align: center; margin-top: 30px;">
+      <button id="redeemBtn" onclick="openRedeemModal()" style="
+        background-color: #6a0dad;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+      ">
+        🎁 Redeem Your Points
+      </button>
+    </div>
+    
+    
+
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+  </div>
+  <div id="redeemModal" style="display: none; position: fixed; top: 0; left: 0; 
+  width: 100%; height: 100%; background: rgba(0,0,0,0.5); 
+  align-items: center; justify-content: center; z-index: 1000;">
+  
+  <div style="background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px;">
+    <h2>Redeem Points</h2>
+    <p>Choose an option:</p>
+    <button onclick="redeem('Option A')">Option A - 100 Points</button><br><br>
+    <button onclick="redeem('Option B')">Option B - 200 Points</button><br><br>
+    <button onclick="redeem('Option C')">Option C - 300 Points</button><br><br>
+    <button onclick="closeRedeemModal()">Cancel</button>
+  </div>
+
+</div>
+  <script>
+    async function fetchDashboard() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in first.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        // Fetch user points and info
+        const res = await fetch('http://localhost:5000/dashboard', {
+          headers: { 'Authorization': token }
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          document.getElementById('userInfo').innerHTML = `
+            <p><strong>Username:</strong> ${data.username}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Mobile:</strong> ${data.mobile}</p>
+            <p><strong>Points:</strong> ${data.points}</p>
+            <p><strong>Last Login:</strong> ${data.lastLogin || 'N/A'}</p>
+          `;
+
+          const goal = 1000; // Example goal
+          const remaining = Math.max(goal - data.points, 0);
+
+          document.getElementById('goalText').innerText = `You just need ${remaining} more points for Free Food!`;
+
+          const progressPercent = Math.min((data.points / goal) * 100, 100);
+          document.getElementById('progressBar').style.width = progressPercent + '%';
+        } else {
+          alert(data.message || 'Error loading dashboard.');
+        }
+      } catch (err) {
+        console.error('Dashboard error:', err);
+        alert('Server not reachable.');
+      }
+    }
+
+    async function fetchRedemptions() {
+      const token = localStorage.getItem('token');
+      const list = document.getElementById('redemptionList');
+      if (!token) {
+        list.innerHTML = '<li>Please log in to view redemptions.</li>';
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:5000/user/redemptions', {
+          headers: { Authorization: token }
+        });
+        const redemptions = await res.json();
+
+        if (res.ok && redemptions.length > 0) {
+          list.innerHTML = '';
+          redemptions.forEach(r => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${r.OPTION}</strong> - ${r.status} <br><small>${new Date(r.requested_at).toLocaleString()}</small>`;
+            list.appendChild(li);
+          });
+        } else {
+          list.innerHTML = '<li>No redemptions yet. Start redeeming your points! 🎉</li>';
+        }
+      } catch (err) {
+        console.error('Redemption fetch error:', err);
+        list.innerHTML = '<li>Unable to fetch redemptions.</li>';
+      }
+    }
+    async function redeem(option) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return alert('Please log in first.');
+      }
+
+      try {
+        const res = await fetch('http://localhost:5000/redeem', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify({ option })
+        });
+        const data = await res.json();
+        alert(data.message);
+        closeRedeemModal(); // ✅ After redeeming, close the modal
+      } catch (err) {
+        console.error('Redeem error:', err);
+        alert('Failed to submit redemption.');
+      }
+    }
+
+
+    function openRedeemModal() {
+      document.getElementById('redeemModal').style.display = 'flex';
+    }
+
+
+    function closeRedeemModal() {
+       document.getElementById('redeemModal').style.display = 'none';
+    }
+
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+
+    fetchDashboard();
+    fetchRedemptions();
+  </script>
+
+</body>
+</html>

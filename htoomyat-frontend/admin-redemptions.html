@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Redemption Requests</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #f7f7f7; }
+    h2 { margin-bottom: 1rem; }
+    .redemption { background: white; padding: 1rem; margin-bottom: 1rem; border-radius: 6px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    .redemption span { display: inline-block; min-width: 150px; margin-right: 1rem; }
+    .buttons { margin-top: 0.5rem; }
+    button { margin-right: 0.5rem; padding: 5px 10px; }
+  </style>
+</head>
+<body>
+  <h2>Pending Redemption Requests</h2>
+  <div id="redemptionsList">Loading...</div>
+
+  <!-- 👇 Correctly wrap your JS code inside <script> tag -->
+  <script>
+    async function fetchRedemptions() {
+      const res = await fetch("http://localhost:5000/admin/redemptions");
+      const redemptions = await res.json();
+      const list = document.getElementById("redemptionsList");
+      list.innerHTML = "";
+
+      redemptions.forEach(r => {
+        if (r.status !== "pending") return;
+
+        const div = document.createElement("div");
+        div.className = "redemption";
+        div.innerHTML = `
+          <span><strong>Email:</strong> ${r.email}</span>
+          <span><strong>Option:</strong> ${r.OPTION}</span>
+          <span><strong>Status:</strong> ${r.status}</span>
+          <div class="buttons">
+            <button onclick="approve(${r.id}, '${r.email}', '${r.OPTION}')">✅ Approve</button>
+            <button onclick="reject(${r.id})">❌ Reject</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+
+      if (!list.hasChildNodes()) {
+        list.innerText = "No pending requests.";
+      }
+    }
+
+    async function approve(id, email, option) {
+      const pointsToDeduct = prompt(`How many points to deduct for ${email} (${option})?`);
+      if (!pointsToDeduct || isNaN(pointsToDeduct)) {
+        alert("Invalid points entered. Cancelled.");
+        return;
+      }
+
+      const res = await fetch("http://localhost:5000/admin/approve-redemption", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ redemptionId: id, pointsToDeduct: Number(pointsToDeduct) })
+      });
+      const result = await res.json();
+      alert(result.message);
+      fetchRedemptions();
+    }
+
+    async function reject(id) {
+      const res = await fetch("http://localhost:5000/admin/reject-redemption", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ redemptionId: id })
+      });
+      const result = await res.json();
+      alert(result.message);
+      fetchRedemptions();
+    }
+
+    fetchRedemptions();
+  </script>
+
+</body>
+</html>

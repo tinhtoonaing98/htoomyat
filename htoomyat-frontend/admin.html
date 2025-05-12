@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - Htoomyat</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    <h2>Users and Points</h2>
+    <div id="userList"></div>
+  </div>
+  <div style="text-align: center; margin-top: 20px;">
+    <a href="admin-redemptions.html">
+      <button style="
+        background-color: #6a0dad;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+      ">
+        📥 View Redemption Requests
+      </button>
+    </a>
+  </div>
+  
+  <button id="logoutButton" style="position: absolute; top: 20px; right: 20px;">Logout</button>
+
+  <script>
+    async function fetchUsers() {
+      const response = await fetch("http://localhost:5000/admin/users");
+      const users = await response.json();
+
+      const userList = document.getElementById("userList");
+      userList.innerHTML = "";
+
+      users.forEach(user => {
+        const userRow = document.createElement("div");
+        userRow.className = "user-row";
+        userRow.innerHTML = `
+          <span><strong>ID:</strong> ${user.id}</span>
+          <span><strong>Email:</strong> ${user.email}</span>
+          <span><strong>Points:</strong> ${user.points}</span>
+          <input type="number" placeholder="Adjust" id="adjust-${user.id}" />
+          <button onclick="adjustPoints(${user.id})">Adjust</button>
+          <input type="number" placeholder="Add" id="add-${user.id}" />
+          <button onclick="addPoints(${user.id})">Add</button>
+        `;
+        userList.appendChild(userRow);
+      });
+    }
+
+    async function adjustPoints(id) {
+  const points = parseInt(document.getElementById(`adjust-${id}`).value);
+  if (isNaN(points)) {
+    alert("Please enter a valid number to adjust.");
+    return;
+  }
+
+  const response = await fetch("http://localhost:5000/admin/adjust-points", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: id, points: points })
+  });
+
+  const result = await response.json();
+  alert(result.message);
+  fetchUsers();
+}
+
+
+    async function addPoints(id) {
+  const points = parseInt(document.getElementById(`add-${id}`).value);
+  if (isNaN(points)) {
+    alert("Please enter a valid number to add.");
+    return;
+  }
+
+  const response = await fetch("http://localhost:5000/admin/add-points", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: id, pointsToAdd: points })
+  });
+
+  const result = await response.json();
+  alert(result.message);
+  fetchUsers();
+}
+
+
+    fetchUsers();
+
+    document.getElementById('logoutButton').addEventListener('click', function() {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('adminToken'); // Remove the token
+        window.location.href = '/htoomyat-frontend/admin-login.html';
+// Redirect to admin login page
+      }
+    });
+
+
+  </script>
+</body>
+</html>

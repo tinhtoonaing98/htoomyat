@@ -1,0 +1,110 @@
+/* General body for all pages */
+body {
+  background: #f5f5f5;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Center form pages (login, register) */
+form {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 320px;
+  margin: auto;
+  margin-top: 50px;
+}
+
+form h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 16px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: #6a5acd;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #5a4abc;
+}
+
+a {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  color: #6a5acd;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Admin Dashboard Specific */
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+  color: #4b0082;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.user-row input {
+  width: 60px;
+  padding: 5px;
+  margin: 0 5px;
+}
+
+.user-row button {
+  background: #6a0dad;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: auto; /* prevent stretching like form buttons */
+}
+
+.user-row button:hover {
+  background: #5a0080;
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="css/style.css">
+
+  <title>Admin Login</title>
+</head>
+<body>
+  <h2>Admin Login</h2>
+  <form id="adminLoginForm">
+    <input type="text" id="adminEmail" placeholder="Admin Email" required><br><br>
+    <input type="password" id="adminPassword" placeholder="Password" required><br><br>
+    <button type="submit">Login</button>
+  </form>
+  
+  <script>
+    document.getElementById('adminLoginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+
+      try {
+        const response = await fetch('http://localhost:5000/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.status === 200) {
+          localStorage.setItem('adminToken', result.token);
+          alert('Admin Login successful!');
+          window.location.href = '/htoomyat-frontend/admin.html'; // Redirect to admin dashboard
+        } else {
+          alert('Admin Login failed: ' + result.message);
+        }
+      } catch (error) {
+        alert('Failed to connect to server.');
+      }
+    };
+  </script>
+</body>
+</html>

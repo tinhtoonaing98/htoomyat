@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "bcryptjs": "^3.0.2"
+  },
+  "name": "htoomyat-frontend",
+  "version": "1.0.0",
+  "main": "test-bcrypt.js.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
